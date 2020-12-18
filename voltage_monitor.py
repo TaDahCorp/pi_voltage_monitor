@@ -21,6 +21,9 @@ REQUIREMENTS:
 17 	Arm frequency capping has occurred
 18 	Throttling has occurred
 19 	Soft temperature limit has occurred
+
+UPDATES
+- now not showing in red or counting as error the "occurred" 16..19
 '''
 import sys,time,datetime
 from os.path import isfile
@@ -112,19 +115,19 @@ while True:
             status.append(fields[4])
         if result['16'] == True:
             row[5]=1
-            sum_bits += 1
+            # sum_bits += 1
             status.append(fields[5])
         if result['17'] == True:
             row[6]=1
-            sum_bits += 1
+            # sum_bits += 1
             status.append(fields[6])
         if result['18'] == True:
             row[7]=1
-            sum_bits += 1
+            # sum_bits += 1
             status.append(fields[7])
         if result['19'] == True:
             row[8]=1
-            sum_bits += 1
+            # sum_bits += 1
             status.append(fields[8])
     # print("row",row)        
     if sum_bits == 0:
