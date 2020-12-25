@@ -1,6 +1,6 @@
 '''
 TADAHCORP.COM
-version 1.1
+version 1.2
 PURPOSE:
     Displays voltage or temperature issues on a Raspberry Pi
 USAGE:
@@ -24,6 +24,8 @@ REQUIREMENTS:
 
 UPDATES
 - now not showing in red or counting as error the "occurred" 16..19
+- store and display after normal the datetime last error
+
 '''
 import sys,time,datetime
 from os.path import isfile
@@ -78,6 +80,11 @@ def get_date():
     datetime_string = now_date.strftime("%H:%M:%S")
     return datetime_string
 
+def get_datetime():
+    now_date = datetime.datetime.now()
+    datetime_string = now_date.strftime("%b %d %Y %H:%M:%S")
+    return datetime_string
+
 vcgm = Vcgencmd()
 try:
     interval = float(sys.argv[1])
@@ -88,6 +95,8 @@ except Exception as e:
     interval = 1
 
 num_errors = 0
+last_error = ""
+
 while True:
     status = []
     row = [get_date(),0,0,0,0,0,0,0,0]
@@ -101,18 +110,22 @@ while True:
             row[1]=1
             sum_bits += 1
             status.append(fields[1])
+            last_error = "(last err since boot under VDC: " + get_datetime() + ")"
         if result['1'] == True:
             row[2]=1
             sum_bits += 1
             status.append(fields[2])
+            last_error = "(last err since boot arm freq cap: " + get_datetime() + ")"
         if result['2'] == True:
             row[3]=1
             sum_bits += 1
             status.append(fields[3])
+            last_error = "(last err throttled: " + get_datetime() + ")"
         if result['3'] == True:
             row[4]=1
             sum_bits += 1
             status.append(fields[4])
+            last_error = "(last err temp limit: " + get_datetime() + ")"
         if result['16'] == True:
             row[5]=1
             # sum_bits += 1
@@ -131,7 +144,7 @@ while True:
             status.append(fields[8])
     # print("row",row)        
     if sum_bits == 0:
-        print('\r', get_date() + ": normal", sep='', end='', flush=True)
+        print('\r', get_date() + ": normal " + last_error, sep='', end='', flush=True)
     else:
         num_errors += 1
         if hascolor == True:
